@@ -142,32 +142,35 @@ function getDirectoryCompletions(
     if (!existsSync(searchDir) || !statSync(searchDir).isDirectory()) {
       return null;
     }
-    const entries = readdirSync(searchDir, { withFileTypes: true });
+    const entries = readdirSync(searchDir);
     const results: AutocompleteItem[] = [];
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        if (!partialName || entry.name.toLowerCase().startsWith(partialName.toLowerCase())) {
-          const fullPath = join(searchDir, entry.name);
-          let value: string;
-          if (isAbsolute(expanded) || expanded.startsWith("~")) {
-            value = fullPath;
-            if (expanded.startsWith("~") && process.env.HOME) {
-              value = value.replace(
-                new RegExp(`^${escapeRegex(process.env.HOME as string)}`),
-                "~",
-              );
-            }
-          } else {
-            // For relative paths, preserve the user's typed prefix (handles `../` etc.)
-            if (prefix.endsWith("/")) {
-              value = prefix + entry.name;
-            } else {
-              const dirPart = dirname(prefix || "");
-              value = dirPart === "." ? entry.name : join(dirPart, entry.name);
-            }
-          }
-          results.push({ label: entry.name, value });
+    for (const name of entries) {
+      if (!partialName || name.toLowerCase().startsWith(partialName.toLowerCase())) {
+        try {
+          const s = statSync(join(searchDir, name));
+          if (!s.isDirectory()) continue;
+        } catch {
+          continue;
         }
+        let value: string;
+        if (isAbsolute(expanded) || expanded.startsWith("~")) {
+          value = join(searchDir, name);
+          if (expanded.startsWith("~") && process.env.HOME) {
+            value = value.replace(
+              new RegExp(`^${escapeRegex(process.env.HOME as string)}`),
+              "~",
+            );
+          }
+        } else {
+          // For relative paths, preserve the user's typed prefix (handles `../` etc.)
+          if (prefix.endsWith("/")) {
+            value = prefix + name;
+          } else {
+            const dirPart = dirname(prefix || "");
+            value = dirPart === "." ? name : join(dirPart, name);
+          }
+        }
+        results.push({ label: name, value });
       }
     }
     return results.length > 0 ? results : null;
