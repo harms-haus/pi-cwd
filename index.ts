@@ -158,8 +158,13 @@ function getDirectoryCompletions(
               );
             }
           } else {
-            const dirPart = dirname(prefix || "");
-            value = dirPart === "." ? entry.name : join(dirPart, entry.name);
+            // For relative paths, preserve the user's typed prefix (handles `../` etc.)
+            if (prefix.endsWith("/")) {
+              value = prefix + entry.name;
+            } else {
+              const dirPart = dirname(prefix || "");
+              value = dirPart === "." ? entry.name : join(dirPart, entry.name);
+            }
           }
           results.push({ label: entry.name, value });
         }
