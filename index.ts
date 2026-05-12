@@ -112,71 +112,65 @@ function getDirectoryCompletions(
   prefix: string,
   baseCwd: string,
 ): AutocompleteItem[] | null {
+  const expanded = expandTilde(prefix || "");
+  const isTrailingSlash = expanded.endsWith("/");
+  let searchDir: string;
+  let partialName: string;
+  if (isTrailingSlash || expanded === "" || expanded === ".") {
+    // Prefix ends with "/" — list contents of the directory
+    let dirPath = expanded.slice(0, -1) || ".";
+    dirPath = expandTilde(dirPath);
+    searchDir = isAbsolute(dirPath) ? dirPath : resolve(baseCwd, dirPath);
+    partialName = "";
+  } else {
+    // Prefix does not end with "/" — find directories matching the last segment
+    searchDir = isAbsolute(expanded) ? dirname(expanded) : resolve(baseCwd, dirname(expanded) || ".");
+    partialName = basename(expanded);
+  }
+  // Verify searchDir exists and is a directory
   try {
-    const expanded = expandTilde(prefix || "");
-    let searchDir: string;
-    let partialName: string;
-    if (expanded === "" || expanded === ".") {
-      searchDir = baseCwd;
-      partialName = "";
-    } else if (isAbsolute(expanded)) {
-      const s = statSync(expanded);
-      if (s.isDirectory()) {
-        searchDir = expanded;
-        partialName = "";
-      } else {
-        searchDir = dirname(expanded);
-        partialName = basename(expanded);
-      }
-    } else {
-      const resolved = resolve(baseCwd, expanded);
-      const s = statSync(resolved);
-      if (s.isDirectory()) {
-        searchDir = resolved;
-        partialName = "";
-      } else {
-        searchDir = dirname(resolved);
-        partialName = basename(resolved);
-      }
-    }
-    if (!existsSync(searchDir) || !statSync(searchDir).isDirectory()) {
-      return null;
-    }
-    const entries = readdirSync(searchDir);
-    const results: AutocompleteItem[] = [];
-    for (const name of entries) {
-      if (!partialName || name.toLowerCase().startsWith(partialName.toLowerCase())) {
-        try {
-          const s = statSync(join(searchDir, name));
-          if (!s.isDirectory()) continue;
-        } catch {
-          continue;
-        }
-        let value: string;
-        if (isAbsolute(expanded) || expanded.startsWith("~")) {
-          value = join(searchDir, name);
-          if (expanded.startsWith("~") && process.env.HOME) {
-            value = value.replace(
-              new RegExp(`^${escapeRegex(process.env.HOME as string)}`),
-              "~",
-            );
-          }
-        } else {
-          // For relative paths, preserve the user's typed prefix (handles `../` etc.)
-          if (prefix.endsWith("/")) {
-            value = prefix + name;
-          } else {
-            const dirPart = dirname(prefix || "");
-            value = dirPart === "." ? name : join(dirPart, name);
-          }
-        }
-        results.push({ label: name, value });
-      }
-    }
-    return results.length > 0 ? results : null;
+    const dirStat = statSync(searchDir);
+    if (!dirStat.isDirectory()) return null;
   } catch {
     return null;
   }
+  // List entries, filtering to directories only
+  const entries = readdirSync(searchDir);
+  const results: AutocompleteItem[] = [];
+  for (const name of entries) {
+    // Filter by partial name match
+    if (partialName && !name.toLowerCase().startsWith(partialName.toLowerCase())) {
+      continue;
+    }
+    // Verify each entry is actually a directory
+    try {
+      const entryStat = statSync(join(searchDir, name));
+      if (!entryStat.isDirectory()) continue;
+    } catch {
+      continue;
+    }
+    // Build the completion value
+    let value: string;
+    if (isAbsolute(expanded) || expanded.startsWith("~")) {
+      value = join(searchDir, name) + (isTrailingSlash ? "" : "");
+      if (expanded.startsWith("~") && process.env.HOME) {
+        value = value.replace(
+          new RegExp(`^${escapeRegex(process.env.HOME as string)}`),
+          "~",
+        );
+      }
+    } else {
+      // For relative paths, preserve the user's typed prefix
+      if (isTrailingSlash) {
+        value = prefix + name;
+      } else {
+        const dirPart = dirname(prefix || "");
+        value = dirPart === "." ? name : join(dirPart, name);
+      }
+    }
+    results.push({ label: name, value });
+  }
+  return results.length > 0 ? results : null;
 }
 
 // ============================================================================
