@@ -17,10 +17,7 @@ A [pi-coding-agent](https://github.com/earendil-works/pi-coding-agent) extension
 ### From GitHub
 
 ```bash
-mkdir -p ~/.pi/agent/extensions/pi-cwd
-cd ~/.pi/agent/extensions/pi-cwd
-curl -fSL https://raw.githubusercontent.com/harms-haus/pi-cwd/main/index.ts -o index.ts
-curl -fSL https://raw.githubusercontent.com/harms-haus/pi-cwd/main/package.json -o package.json
+pi install git:github.com/harms-haus/pi-cwd
 ```
 
 Then start pi — the extension will be auto-discovered. Or reload an existing session with `/reload`.
