@@ -1,0 +1,14 @@
+{
+  "name": "pi-cwd",
+  "version": "1.0.0",
+  "description": "pi-coding-agent extension: change working directory with /cwd <path>",
+  "keywords": ["pi-package"],
+  "main": "index.ts",
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "license": "MIT"
+}
