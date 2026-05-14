@@ -1,0 +1,6 @@
+node_modules/
+dist/
+coverage/
+.bifrost.yaml
+PLAN.md
+RESEARCH*.md
