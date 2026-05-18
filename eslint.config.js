@@ -18,7 +18,6 @@ export default tseslint.config(
       },
     },
     rules: {
-      // Existing good rules
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
@@ -26,12 +25,10 @@ export default tseslint.config(
       "@typescript-eslint/no-non-null-assertion": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
 
-      // Complexity rules
       "max-depth": ["error", 5],
       "max-lines-per-function": ["error", { max: 100, skipBlankLines: true, skipComments: true }],
       complexity: ["error", 15],
 
-      // Strict rules — graduated to error
       "@typescript-eslint/no-unsafe-argument": "error",
       "@typescript-eslint/no-unsafe-assignment": "error",
       "@typescript-eslint/no-unsafe-call": "error",
