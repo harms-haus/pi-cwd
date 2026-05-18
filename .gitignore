@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+*.tgz
 .bifrost.yaml
 PLAN.md
 RESEARCH*.md

@@ -2,13 +2,37 @@
   "name": "pi-cwd",
   "version": "1.0.0",
   "description": "pi-coding-agent extension: change working directory with /cwd <path>",
+  "type": "module",
   "keywords": ["pi-package"],
-  "main": "index.ts",
+  "main": "src/index.ts",
+  "files": ["src/**/*.{ts,js,map}", "README.md", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "engines": { "node": ">=20.0.0" },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": ["./src/index.ts"]
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/"
+  },
+  "dependencies": {
+    "@earendil-works/pi-tui": "^0.74.0"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
+    "@earendil-works/pi-coding-agent": "^0.74.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.6",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.0.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^4.1.6"
   },
   "license": "MIT"
 }

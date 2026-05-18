@@ -26,12 +26,12 @@ Then start pi — the extension will be auto-discovered. Or reload an existing s
 
 ```bash
 git clone https://github.com/harms-haus/pi-cwd.git
-pi -e ./pi-cwd/index.ts
+pi -e ./pi-cwd/src/index.ts
 ```
 
 ### Manual
 
-Copy `index.ts` to `~/.pi/agent/extensions/` (global) or `.pi/extensions/` (project-local).
+Copy `src/index.ts` to `~/.pi/agent/extensions/` (global) or `.pi/extensions/` (project-local).
 
 ## Usage
 
@@ -58,6 +58,18 @@ The system prompt is updated via `before_agent_start` so the LLM is aware of the
 - Other extension tools that read `ctx.cwd` directly will see the original value
 - Resource discovery (AGENTS.md, project-local extensions/skills) stays bound to the original cwd
 - Session files are saved under the original cwd's session directory
+
+## Development
+
+```bash
+npm install          # install dependencies
+npm test             # run tests
+npm run test:coverage # run tests with coverage report
+npm run typecheck    # type-check with TypeScript
+npm run lint         # lint with ESLint
+npm run format       # format with Prettier
+npm run format:check # check formatting
+```
 
 ## License
 
