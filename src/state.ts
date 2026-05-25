@@ -74,6 +74,7 @@ export function restoreCwdFromBranch(ctx: ExtensionContext, original: string): s
     const branch = ctx.sessionManager.getBranch();
     for (let i = branch.length - 1; i >= 0; i--) {
       const entry = branch[i];
+      if (!entry) continue;
       if (
         entry.type === "custom" &&
         entry.customType === "cwd-change" &&

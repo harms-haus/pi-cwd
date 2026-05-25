@@ -39,7 +39,7 @@ function mockFilesystem(entries: Record<string, Array<{ name: string; isDir: boo
   });
 
   readdirSync.mockImplementation((p: string) => {
-    if (p in entries) return entries[p].map((e) => e.name);
+    if (p in entries) return entries[p]!.map((e) => e.name);
     const err = new Error(`ENOENT: no such file or directory, scandir '${p}'`);
     (err as NodeJS.ErrnoException).code = "ENOENT";
     throw err;

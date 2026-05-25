@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20, 22]
+        node-version: [22, 24]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,5 +33,5 @@ jobs:
       - name: Format check
         run: npm run format:check
 
-      - name: Test
-        run: npm test
+      - name: Test with coverage
+        run: npm run test:coverage

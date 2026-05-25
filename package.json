@@ -1,5 +1,5 @@
 {
-  "name": "pi-cwd",
+  "name": "@harms-haus/pi-cwd",
   "version": "1.0.0",
   "description": "pi-coding-agent extension: change working directory with /cwd <path>",
   "type": "module",
@@ -18,7 +18,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "pi": {
     "extensions": [
@@ -35,20 +35,19 @@
     "format:check": "prettier --check src/",
     "lint:fix": "eslint --fix src/"
   },
-  "dependencies": {
-    "@earendil-works/pi-tui": "^0.74.0"
-  },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "^0.74.0"
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
   },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^4.1.6",
-    "eslint": "^9.0.0",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.0.0",
-    "typescript": "^5.0.0",
-    "typescript-eslint": "^8.0.0",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3",
     "vitest": "^4.1.6"
   },
   "license": "MIT",

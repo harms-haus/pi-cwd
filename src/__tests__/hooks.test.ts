@@ -85,7 +85,7 @@ describe("tool_call handler", () => {
   it("returns undefined when effectiveCwd === originalCwd", () => {
     setupCwdSame();
     const input = { command: "ls" };
-    const result = handlers["tool_call"]({ toolName: "bash", input }, {});
+    const result = handlers["tool_call"]!({ toolName: "bash", input }, {});
     expect(result).toBeUndefined();
     expect(input.command).toBe("ls");
   });
@@ -95,7 +95,7 @@ describe("tool_call handler", () => {
       setupCwdDifferent("/test/dir");
       mockBashSingleQuote.mockReturnValue("'/test/dir'");
       const input = { command: "ls" };
-      handlers["tool_call"]({ toolName: "bash", input }, {});
+      handlers["tool_call"]!({ toolName: "bash", input }, {});
       expect(input.command).toBe("cd '/test/dir' && ls");
       expect(mockBashSingleQuote).toHaveBeenCalledWith("/test/dir");
     });
@@ -105,42 +105,42 @@ describe("tool_call handler", () => {
     it("resolves relative path for 'read'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "relative/file.txt" };
-      handlers["tool_call"]({ toolName: "read", input }, {});
+      handlers["tool_call"]!({ toolName: "read", input }, {});
       expect(input.path).toBe("/test/dir/relative/file.txt");
     });
 
     it("leaves absolute path unchanged for 'read'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "/absolute/file.txt" };
-      handlers["tool_call"]({ toolName: "read", input }, {});
+      handlers["tool_call"]!({ toolName: "read", input }, {});
       expect(input.path).toBe("/absolute/file.txt");
     });
 
     it("resolves relative path for 'write'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "output.txt" };
-      handlers["tool_call"]({ toolName: "write", input }, {});
+      handlers["tool_call"]!({ toolName: "write", input }, {});
       expect(input.path).toBe("/test/dir/output.txt");
     });
 
     it("leaves absolute path unchanged for 'write'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "/tmp/output.txt" };
-      handlers["tool_call"]({ toolName: "write", input }, {});
+      handlers["tool_call"]!({ toolName: "write", input }, {});
       expect(input.path).toBe("/tmp/output.txt");
     });
 
     it("resolves relative path for 'edit'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "src/index.ts" };
-      handlers["tool_call"]({ toolName: "edit", input }, {});
+      handlers["tool_call"]!({ toolName: "edit", input }, {});
       expect(input.path).toBe("/test/dir/src/index.ts");
     });
 
     it("leaves absolute path unchanged for 'edit'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "/home/user/src/index.ts" };
-      handlers["tool_call"]({ toolName: "edit", input }, {});
+      handlers["tool_call"]!({ toolName: "edit", input }, {});
       expect(input.path).toBe("/home/user/src/index.ts");
     });
   });
@@ -149,70 +149,70 @@ describe("tool_call handler", () => {
     it("sets path to effectiveCwd when undefined for 'grep'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: undefined };
-      handlers["tool_call"]({ toolName: "grep", input }, {});
+      handlers["tool_call"]!({ toolName: "grep", input }, {});
       expect(input.path).toBe("/test/dir");
     });
 
     it("sets path to effectiveCwd when empty string for 'grep'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "" };
-      handlers["tool_call"]({ toolName: "grep", input }, {});
+      handlers["tool_call"]!({ toolName: "grep", input }, {});
       expect(input.path).toBe("/test/dir");
     });
 
     it("resolves relative path for 'grep'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "src" };
-      handlers["tool_call"]({ toolName: "grep", input }, {});
+      handlers["tool_call"]!({ toolName: "grep", input }, {});
       expect(input.path).toBe("/test/dir/src");
     });
 
     it("leaves absolute path unchanged for 'grep'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "/absolute/src" };
-      handlers["tool_call"]({ toolName: "grep", input }, {});
+      handlers["tool_call"]!({ toolName: "grep", input }, {});
       expect(input.path).toBe("/absolute/src");
     });
 
     it("sets path to effectiveCwd when undefined for 'find'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: undefined };
-      handlers["tool_call"]({ toolName: "find", input }, {});
+      handlers["tool_call"]!({ toolName: "find", input }, {});
       expect(input.path).toBe("/test/dir");
     });
 
     it("resolves relative path for 'find'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "subdir" };
-      handlers["tool_call"]({ toolName: "find", input }, {});
+      handlers["tool_call"]!({ toolName: "find", input }, {});
       expect(input.path).toBe("/test/dir/subdir");
     });
 
     it("leaves absolute path unchanged for 'find'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "/absolute/subdir" };
-      handlers["tool_call"]({ toolName: "find", input }, {});
+      handlers["tool_call"]!({ toolName: "find", input }, {});
       expect(input.path).toBe("/absolute/subdir");
     });
 
     it("sets path to effectiveCwd when undefined for 'ls'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: undefined };
-      handlers["tool_call"]({ toolName: "ls", input }, {});
+      handlers["tool_call"]!({ toolName: "ls", input }, {});
       expect(input.path).toBe("/test/dir");
     });
 
     it("resolves relative path for 'ls'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "subdir" };
-      handlers["tool_call"]({ toolName: "ls", input }, {});
+      handlers["tool_call"]!({ toolName: "ls", input }, {});
       expect(input.path).toBe("/test/dir/subdir");
     });
 
     it("leaves absolute path unchanged for 'ls'", () => {
       setupCwdDifferent("/test/dir");
       const input = { path: "/absolute/subdir" };
-      handlers["tool_call"]({ toolName: "ls", input }, {});
+      handlers["tool_call"]!({ toolName: "ls", input }, {});
       expect(input.path).toBe("/absolute/subdir");
     });
   });
@@ -221,7 +221,7 @@ describe("tool_call handler", () => {
     it("does not modify input for unrecognized toolName", () => {
       setupCwdDifferent("/test/dir");
       const input = { foo: "bar" };
-      handlers["tool_call"]({ toolName: "unknown_tool", input }, {});
+      handlers["tool_call"]!({ toolName: "unknown_tool", input }, {});
       expect(input).toEqual({ foo: "bar" });
     });
   });
@@ -233,7 +233,7 @@ describe("tool_call handler", () => {
 describe("before_agent_start handler", () => {
   it("returns undefined when effectiveCwd === originalCwd", () => {
     setupCwdSame();
-    const result = handlers["before_agent_start"](
+    const result = handlers["before_agent_start"]!(
       { systemPrompt: "Current working directory: /original" },
       {},
     );
@@ -242,7 +242,7 @@ describe("before_agent_start handler", () => {
 
   it("returns modified systemPrompt with new cwd when effectiveCwd !== originalCwd", () => {
     setupCwdDifferent("/new/cwd");
-    const result = handlers["before_agent_start"](
+    const result = handlers["before_agent_start"]!(
       { systemPrompt: "Current working directory: /original" },
       {},
     );
@@ -251,7 +251,7 @@ describe("before_agent_start handler", () => {
 
   it("does not modify prompt when cwd line is absent", () => {
     setupCwdDifferent("/new/cwd");
-    const result = handlers["before_agent_start"]({ systemPrompt: "Some other prompt text" }, {});
+    const result = handlers["before_agent_start"]!({ systemPrompt: "Some other prompt text" }, {});
     // String.replace with a non-matching regex returns the original string
     expect(result).toEqual({ systemPrompt: "Some other prompt text" });
   });
@@ -263,7 +263,7 @@ describe("before_agent_start handler", () => {
 describe("user_bash handler", () => {
   it("returns undefined when effectiveCwd === originalCwd", () => {
     setupCwdSame();
-    const result = handlers["user_bash"]({}, {});
+    const result = handlers["user_bash"]!({}, {});
     expect(result).toBeUndefined();
   });
 
@@ -273,7 +273,7 @@ describe("user_bash handler", () => {
     const mockExec = vi.fn();
     mockGetLocalBashOps.mockReturnValue({ exec: mockExec });
 
-    const result = handlers["user_bash"]({}, {}) as {
+    const result = handlers["user_bash"]!({}, {}) as {
       operations: { exec: (...args: unknown[]) => unknown };
     };
 
@@ -293,7 +293,7 @@ describe("user_bash handler", () => {
     const mockExec = vi.fn();
     mockGetLocalBashOps.mockReturnValue({ exec: mockExec });
 
-    const result = handlers["user_bash"]({}, {}) as {
+    const result = handlers["user_bash"]!({}, {}) as {
       operations: { exec: (...args: unknown[]) => unknown };
     };
 
@@ -321,7 +321,7 @@ describe("session_start handler", () => {
     const ctx = createMockContext();
     mockRestoreCwdFromBranch.mockReturnValue("/restored/cwd");
 
-    handlers["session_start"]({}, ctx);
+    handlers["session_start"]!({}, ctx);
 
     expect(mockRestoreCwdFromBranch).toHaveBeenCalledWith(ctx, mockGetOriginalCwd());
     expect(mockSetEffectiveCwd).toHaveBeenCalledWith("/restored/cwd");
@@ -351,7 +351,7 @@ describe("session_start handler", () => {
       callOrder.push("updateFooterStatus");
     });
 
-    handlers["session_start"]({}, ctx);
+    handlers["session_start"]!({}, ctx);
 
     expect(callOrder).toEqual([
       "restoreCwdFromBranch",
@@ -370,7 +370,7 @@ describe("session_tree handler", () => {
     const ctx = createMockContext();
     mockRestoreCwdFromBranch.mockReturnValue("/restored/cwd");
 
-    handlers["session_tree"]({}, ctx);
+    handlers["session_tree"]!({}, ctx);
 
     expect(mockRestoreCwdFromBranch).toHaveBeenCalledWith(ctx, mockGetOriginalCwd());
     expect(mockSetEffectiveCwd).toHaveBeenCalledWith("/restored/cwd");
@@ -385,7 +385,7 @@ describe("session_tree handler", () => {
     const ctx = createMockContext();
     mockRestoreCwdFromBranch.mockReturnValue("/restored/cwd");
 
-    handlers["session_tree"]({}, ctx);
+    handlers["session_tree"]!({}, ctx);
 
     expect(mockResetBashOps).not.toHaveBeenCalled();
   });
@@ -405,7 +405,7 @@ describe("session_tree handler", () => {
       callOrder.push("updateFooterStatus");
     });
 
-    handlers["session_tree"]({}, ctx);
+    handlers["session_tree"]!({}, ctx);
 
     expect(callOrder).toEqual(["restoreCwdFromBranch", "setEffectiveCwd", "updateFooterStatus"]);
   });
