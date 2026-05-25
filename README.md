@@ -14,6 +14,12 @@ A [pi-coding-agent](https://github.com/earendil-works/pi-coding-agent) extension
 
 ## Install
 
+### From npm
+
+```bash
+pi install npm:@harms-haus/pi-cwd
+```
+
 ### From GitHub
 
 ```bash
