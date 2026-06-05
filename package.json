@@ -33,7 +33,12 @@
     "lint": "eslint src/",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "lint:fix": "eslint --fix src/"
+    "lint:fix": "eslint --fix src/",
+    "pre-commit-check": "npm run format:check && npm run lint && npm run typecheck",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run pre-commit-check"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",
@@ -48,7 +53,8 @@
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "simple-git-hooks": "^2.13.1"
   },
   "license": "MIT",
   "repository": {

@@ -102,14 +102,27 @@ describe("updateFooterStatus", () => {
     expect(ctx.ui.setStatus).toHaveBeenCalledWith(STATUS_KEY, undefined);
   });
 
-  it("cwd !== original and hasUI true → setStatus called with (STATUS_KEY, theme.fg result)", () => {
+  it("cwd !== original and hasUI true → setStatus called with (STATUS_KEY, JSON string)", () => {
     const ctx = createMockContext();
     const original = "/home/user";
     const cwd = "/home/user/projects";
     updateFooterStatus(ctx, cwd, original);
     expect(ctx.ui.setStatus).toHaveBeenCalledTimes(1);
-    expect(ctx.ui.setStatus).toHaveBeenCalledWith(STATUS_KEY, expect.any(String));
-    expect(ctx.ui.theme.fg).toHaveBeenCalledWith("accent", expect.stringContaining("projects"));
+    const setStatusArg = (ctx.ui.setStatus as any).mock.calls[0];
+    expect(setStatusArg[0]).toBe(STATUS_KEY);
+    const parsed = JSON.parse(setStatusArg[1] as string);
+    expect(parsed).toEqual({ cwd: expect.stringContaining("projects") });
+  });
+
+  it("parsed JSON has exactly one key 'cwd' of type string", () => {
+    const ctx = createMockContext();
+    const original = "/home/user";
+    const cwd = "/home/user/projects";
+    updateFooterStatus(ctx, cwd, original);
+    const setStatusArg = (ctx.ui.setStatus as any).mock.calls[0];
+    const parsed = JSON.parse(setStatusArg[1] as string);
+    expect(Object.keys(parsed)).toEqual(["cwd"]);
+    expect(typeof parsed.cwd).toBe("string");
   });
 
   it("hasUI is false → no setStatus call at all", () => {
@@ -120,42 +133,37 @@ describe("updateFooterStatus", () => {
     expect(ctx.ui.setStatus).not.toHaveBeenCalled();
   });
 
-  it("cwd starts with HOME → display path replaces HOME with ~", () => {
+  it("cwd starts with HOME → JSON cwd replaces HOME with ~", () => {
     const ctx = createMockContext();
     const home = process.env.HOME;
     if (!home) return; // skip if HOME not set
     const cwd = `${home}/projects/foo`;
     const original = "/original";
     updateFooterStatus(ctx, cwd, original);
-    expect(ctx.ui.theme.fg).toHaveBeenCalledWith(
-      "accent",
-      expect.stringContaining("~/projects/foo"),
-    );
-    expect(ctx.ui.theme.fg).not.toHaveBeenCalledWith(
-      expect.anything(),
-      expect.stringContaining(home),
-    );
+    const setStatusArg = (ctx.ui.setStatus as any).mock.calls[0];
+    const parsed = JSON.parse(setStatusArg[1] as string);
+    expect(parsed.cwd).toBe("~/projects/foo");
+    expect(parsed.cwd).not.toContain(home);
   });
 
-  it("cwd does not start with HOME → full path shown", () => {
+  it("cwd does not start with HOME → full path in JSON", () => {
     const ctx = createMockContext();
     const cwd = "/tmp/some/dir";
     const original = "/original";
     updateFooterStatus(ctx, cwd, original);
-    expect(ctx.ui.theme.fg).toHaveBeenCalledWith(
-      "accent",
-      expect.stringContaining("/tmp/some/dir"),
-    );
+    const setStatusArg = (ctx.ui.setStatus as any).mock.calls[0];
+    const parsed = JSON.parse(setStatusArg[1] as string);
+    expect(parsed.cwd).toBe("/tmp/some/dir");
   });
 
-  it("displays raw path when HOME is empty", () => {
+  it("displays raw path in JSON when HOME is empty", () => {
     vi.stubEnv("HOME", "");
     const ctx = createMockContext();
     updateFooterStatus(ctx, "/tmp/some/dir", "/original");
-    expect(ctx.ui.setStatus).toHaveBeenCalledWith(
-      STATUS_KEY,
-      ctx.ui.theme.fg("accent", "📂 /tmp/some/dir"),
-    );
+    const setStatusArg = (ctx.ui.setStatus as any).mock.calls[0];
+    expect(setStatusArg[0]).toBe(STATUS_KEY);
+    const parsed = JSON.parse(setStatusArg[1] as string);
+    expect(parsed.cwd).toBe("/tmp/some/dir");
     vi.unstubAllEnvs();
   });
 });

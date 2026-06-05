@@ -62,7 +62,7 @@ export function updateFooterStatus(ctx: ExtensionContext, cwd: string, original:
   }
   const home = process.env.HOME || "";
   const displayPath = home ? cwd.replace(new RegExp(`^${escapeRegex(home)}`), "~") : cwd;
-  ctx.ui.setStatus(STATUS_KEY, ctx.ui.theme.fg("accent", `📂 ${displayPath}`));
+  ctx.ui.setStatus(STATUS_KEY, JSON.stringify({ cwd: displayPath }));
 }
 
 /**
