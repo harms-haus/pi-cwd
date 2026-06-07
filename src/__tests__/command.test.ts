@@ -52,7 +52,7 @@ afterEach(() => {
 describe("/cwd command handler", () => {
   /** Helper: register extension and return the captured command handler + completions getter */
   function setup() {
-    const { api, registerCommand, appendEntry } = createMockAPI();
+    const { api, registerCommand, appendEntry, events } = createMockAPI();
     extension(api);
     const { name, options } = captureCommand(registerCommand);
     return {
@@ -64,6 +64,7 @@ describe("/cwd command handler", () => {
       getArgumentCompletions: options.getArgumentCompletions as (prefix: string) => unknown,
       appendEntry,
       api,
+      events,
     };
   }
 
@@ -96,8 +97,8 @@ describe("/cwd command handler", () => {
   });
 
   // ── Valid directory ───────────────────────────────────────────────
-  it("valid directory → sets effectiveCwd, appends entry, updates footer, notifies", async () => {
-    const { handler, appendEntry } = setup();
+  it("valid directory → sets effectiveCwd, appends entry, updates footer, notifies, emits event", async () => {
+    const { handler, appendEntry, events } = setup();
     const ctx = createMockContext();
     const targetPath = "/tmp/some/dir";
 
@@ -114,6 +115,9 @@ describe("/cwd command handler", () => {
 
     // Footer updated (setStatus called)
     expect(ctx.ui.setStatus).toHaveBeenCalled();
+
+    // Event emitted
+    expect(events.emit).toHaveBeenCalledWith("cwd-change", { cwd: targetPath });
 
     // Success notification
     expect(ctx.ui.notify).toHaveBeenCalledWith(

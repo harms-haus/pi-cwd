@@ -16,6 +16,10 @@ export function createMockAPI() {
   const appendEntry = vi.fn();
   const sendMessage = vi.fn();
   const registerMessageRenderer = vi.fn();
+  const events = {
+    emit: vi.fn(),
+    on: vi.fn(() => vi.fn()),
+  };
 
   const api = {
     registerCommand,
@@ -23,6 +27,7 @@ export function createMockAPI() {
     appendEntry,
     sendMessage,
     registerMessageRenderer,
+    events,
   } as unknown as ExtensionAPI;
 
   return {
@@ -32,6 +37,7 @@ export function createMockAPI() {
     appendEntry,
     sendMessage,
     registerMessageRenderer,
+    events,
   };
 }
 

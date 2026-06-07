@@ -54,10 +54,12 @@ import { createMockAPI, createMockContext, captureHandlers } from "./helpers/moc
 // Setup — run extension entry point to register handlers
 // ============================================================================
 let handlers: Record<string, (...args: unknown[]) => unknown>;
+let events: ReturnType<typeof createMockAPI>["events"];
 
 beforeEach(() => {
   vi.clearAllMocks();
-  const { api, on } = createMockAPI();
+  const { api, on, events: mockEvents } = createMockAPI();
+  events = mockEvents;
   indexModule(api);
   handlers = captureHandlers(on);
 });
@@ -317,7 +319,7 @@ describe("user_bash handler", () => {
 // session_start handler
 // ============================================================================
 describe("session_start handler", () => {
-  it("calls restoreCwdFromBranch, setEffectiveCwd, resetBashOps, updateFooterStatus", () => {
+  it("calls restoreCwdFromBranch, setEffectiveCwd, resetBashOps, updateFooterStatus, emits cwd-change", () => {
     const ctx = createMockContext();
     mockRestoreCwdFromBranch.mockReturnValue("/restored/cwd");
 
@@ -331,6 +333,9 @@ describe("session_start handler", () => {
       mockGetEffectiveCwd(),
       mockGetOriginalCwd(),
     );
+    expect(events.emit).toHaveBeenCalledWith("cwd-change", {
+      cwd: mockGetEffectiveCwd(),
+    });
   });
 
   it("calls functions in correct order", () => {
@@ -350,6 +355,9 @@ describe("session_start handler", () => {
     mockUpdateFooterStatus.mockImplementation(() => {
       callOrder.push("updateFooterStatus");
     });
+    events.emit.mockImplementation(() => {
+      callOrder.push("emit");
+    });
 
     handlers["session_start"]!({}, ctx);
 
@@ -358,6 +366,7 @@ describe("session_start handler", () => {
       "setEffectiveCwd",
       "resetBashOps",
       "updateFooterStatus",
+      "emit",
     ]);
   });
 });
@@ -366,7 +375,7 @@ describe("session_start handler", () => {
 // session_tree handler
 // ============================================================================
 describe("session_tree handler", () => {
-  it("calls restoreCwdFromBranch, setEffectiveCwd, updateFooterStatus", () => {
+  it("calls restoreCwdFromBranch, setEffectiveCwd, updateFooterStatus, emits cwd-change", () => {
     const ctx = createMockContext();
     mockRestoreCwdFromBranch.mockReturnValue("/restored/cwd");
 
@@ -379,6 +388,9 @@ describe("session_tree handler", () => {
       mockGetEffectiveCwd(),
       mockGetOriginalCwd(),
     );
+    expect(events.emit).toHaveBeenCalledWith("cwd-change", {
+      cwd: mockGetEffectiveCwd(),
+    });
   });
 
   it("does NOT call resetBashOps", () => {
@@ -404,9 +416,17 @@ describe("session_tree handler", () => {
     mockUpdateFooterStatus.mockImplementation(() => {
       callOrder.push("updateFooterStatus");
     });
+    events.emit.mockImplementation(() => {
+      callOrder.push("emit");
+    });
 
     handlers["session_tree"]!({}, ctx);
 
-    expect(callOrder).toEqual(["restoreCwdFromBranch", "setEffectiveCwd", "updateFooterStatus"]);
+    expect(callOrder).toEqual([
+      "restoreCwdFromBranch",
+      "setEffectiveCwd",
+      "updateFooterStatus",
+      "emit",
+    ]);
   });
 });

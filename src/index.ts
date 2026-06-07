@@ -56,21 +56,21 @@ export default function (pi: ExtensionAPI): void {
           ctx.ui.notify(`Not a directory: ${newCwd}`, "error");
           return;
         }
-      } catch (err: unknown) {
-        const code = (err as NodeJS.ErrnoException).code;
-        if (code === "ENOENT") {
-          ctx.ui.notify(`Directory does not exist: ${newCwd}`, "error");
-        } else if (code === "EACCES") {
-          ctx.ui.notify(`Permission denied: ${newCwd}`, "error");
-        } else {
-          ctx.ui.notify(`Cannot access directory: ${newCwd}`, "error");
-        }
+      } catch (_err: unknown) {
+        const code = (_err as NodeJS.ErrnoException).code;
+        const msg =
+          code === "ENOENT"
+            ? "Directory does not exist"
+            : code === "EACCES"
+              ? "Permission denied"
+              : "Cannot access directory";
+        ctx.ui.notify(`${msg}: ${newCwd}`, "error");
         return;
       }
-      const realCwd = realpathSync(newCwd);
-      setEffectiveCwd(realCwd);
+      setEffectiveCwd(realpathSync(newCwd));
       pi.appendEntry(CWD_CHANGE_TYPE, { cwd: getEffectiveCwd() });
       updateFooterStatus(ctx, getEffectiveCwd(), getOriginalCwd());
+      pi.events.emit("cwd-change", { cwd: getEffectiveCwd() });
       ctx.ui.notify(`Changed working directory to ${getEffectiveCwd()}`, "info");
     },
     getArgumentCompletions: (argumentPrefix: string): AutocompleteItem[] | null => {
@@ -141,10 +141,12 @@ export default function (pi: ExtensionAPI): void {
     setEffectiveCwd(restoreCwdFromBranch(ctx, getOriginalCwd()));
     resetBashOps();
     updateFooterStatus(ctx, getEffectiveCwd(), getOriginalCwd());
+    pi.events.emit("cwd-change", { cwd: getEffectiveCwd() });
   });
 
   pi.on("session_tree", (_event, ctx) => {
     setEffectiveCwd(restoreCwdFromBranch(ctx, getOriginalCwd()));
     updateFooterStatus(ctx, getEffectiveCwd(), getOriginalCwd());
+    pi.events.emit("cwd-change", { cwd: getEffectiveCwd() });
   });
 }
